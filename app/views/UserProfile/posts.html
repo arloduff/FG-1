@@ -1,0 +1,11 @@
+#{extends 'UserProfile.html' /}
+#{set 'moreStyles'}
+	#{stylesheet src:'pagination.css' /}
+#{/set}
+
+#{paginate.summary items:paginator /}
+#{paginate.list items:paginator, as:'post'}
+	#{display post:post, as:'teaser' /}
+#{/paginate.list}
+#{paginate.controls items:paginator /}
+

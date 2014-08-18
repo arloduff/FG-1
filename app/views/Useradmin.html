@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<title>Administration</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=${_response_encoding}"/>
+		#{get 'moreStyles' /}
+		<link rel="stylesheet" type="text/css" media="screen" href="@{'/public/stylesheets/main.css'}" />
+		#{stylesheet src:'useradmin.css' /}
+		<link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}" />
+		<script src="@{'/public/javascripts/jquery-1.7.2.min.js'}"></script>
+		<script src="@{'/public/javascripts/jquery.tools-1.2.5.toolbox.expose.min.js'}"></script>
+	</head>
+
+	<body id="admin">
+
+		<div id="header">
+			<div id="logo">
+				User <span>administration</span>
+			</div><!-- logo -->
+			<ul id="tools">
+				<li>
+					<a href="@{Secure.logout()}">Log out</a>
+				</li>
+			</ul>
+		</div><!-- header -->
+
+		<div id="main">
+			Administration Tools
+
+			<ul id="adminMenu">
+				<li class="${request.controller == 'Admin' ? 'selected' : ''}">
+					<a href="@{Useradmin.index()}">My posts</a>
+				</li>
+				<li class="${request.controller == 'Posts' ? 'selected' : ''}">
+					<a href="@{Posts.list()}">Posts</a>
+				</li>
+				<li class="${request.controller == 'Users' ? 'selected' : ''}">
+					<a href="@{Users.list()}">Users</a>
+				</li>
+				<li class="${request.controller == 'Restaurants' ? 'selected' : ''}">
+					<a href="@{Restaurants.list()}">Restaurants</a>
+				</li>
+			</ul>
+
+			#{doLayout /}
+		</div><!-- main -->
+
+		<p id="footer">
+			<a href="/">Back to Main Site</a>
+		</p>
+
+	</body>
+</html>

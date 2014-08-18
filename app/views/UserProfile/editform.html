@@ -1,0 +1,75 @@
+#{extends 'UserProfile.html' /}
+#{set title:'Edit Your Profile' /}
+#{set header:'Edit Your Profile' /}
+
+#{form @save(user?.id), enctype: 'multipart/form-data'}
+	<fieldset>
+		<legend>Your Information</legend>
+
+    #{ifErrors}
+        <p class="error">
+            Both a name and an e-mail address are required.
+        </p>
+    #{/ifErrors}
+
+		#{field 'profilePic'}
+			<div id = "profilePic">
+				<label>Picture: </label>
+				<img src = "@{UserProfile.profilePic(user?.id)}" alt = "No picture uploaded." class = "profilePic" />
+				<input type = "file" name = "${field.name}" />
+			</div>
+		#{/field}
+		#{field 'firstname'}
+			<div id = "firstname">
+				<label>First Name: </label>
+				<input type = "text" name = "${field.name}" value = "${user?.firstname}" class = "${field.errorClass}" />
+			</div>
+		#{/field}
+		#{field 'lastname'}
+			<div id = "lastname">
+				<label>Last Name: </label>
+				<input type = "text" name = "${field.name}" value = "${user?.lastname}" class = "${field.errorClass}" />
+			</div>
+		#{/field}
+		#{field 'email'}
+			<div id = "email">
+				<label>E-mail: </label>
+				<input type = "text" name = "${field.name}" value = "${user?.email}" class = "${field.errorClass}" />
+			</div>
+		#{/field}
+		#{field 'city'}
+			<div id = "city">
+				<label>City: </label>
+				<input type = "text" name = "${field.name}" value = "${user?.city}" />
+			</div>
+		#{/field}
+		#{field 'state'}
+			<div id = "state">
+				<label>State: </label>
+				#{usstates selected:user?.state /}
+			</div>
+		#{/field}
+		#{field 'aboutme'}
+			<div id = "aboutme">
+			<label>About Me: </label>
+			<textarea name = "${field.name}" rows = "10" cols = "75">${user?.aboutme}</textarea>
+			</div>
+		#{/field}
+		<input type = "submit" value = "Save" />
+		<input type = "reset" value = "Restore Original Profile" />
+	</fieldset>
+#{/form}
+
+#{set 'sidebar'}
+	#{if flash.success}
+		<b>Hint: </b>
+	#{/if}
+	Your profile is your way of telling other food connoisseurs about yourself. You can customize it to say something about 'you' that lets the world know this is who you are!
+#{/set}
+
+#{set 'success'}
+<!-- Success message to be displayed only when the user has just created his new account -->
+<h3>Your account has been created!</h3>
+		<p>The next step is to create your profile. Please enter some information about yourself below that will help other users with similar interests find you and add you as a contact!"</p>
+#{/set}
+

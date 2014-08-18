@@ -1,0 +1,116 @@
+*{ Template to allow users to edit a restaurant profile }*
+#{extends 'restaurants.html' /}
+
+
+*{ If no restaurant ID was specified, then we are creating a new restaurant, not editing an existing one }*
+#{ifnot restaurant?.id}
+    <h3>Create <span>a new restaurant</span></h3>
+#{/ifnot}
+#{else}
+    <h3>Edit <span>this restaurant</span></h3>
+#{/else}
+
+*{ Form to enter or edit restaurant info }*
+#{form @save(restaurant?.id), enctype:'multipart/form-data'}
+
+    *{ If we were sent here after trying to submit the form before, there may be errors }*
+    #{ifErrors}
+        <p class="error">
+            Please correct these errors.
+        </p>
+			#{list errors, as:'err'}
+			<div class = "err">
+				${err}
+			</div>
+			#{/list}
+    #{/ifErrors}
+
+		*{ Restaurant's Info }*
+		<p >
+			#{field 'name' }
+			<label>Name of restaurant:</label>
+			<input type = "text" name = " ${field.name}" id = "restaurant_name"
+				value = "${restaurant?.name}"class="${field.errorClass}" onKeyUp = "showRestaurant();" />
+		</p>
+		#{/field}
+		<p>
+			#{field 'street1'}
+			<label>Address (Line 1):</label>
+			<input type = "text" name = " ${field.name}"
+				value = "${restaurant?.street1}" class="${field.errorClass}" />
+		</p>
+		#{/field}
+		#{field 'street2'}
+		<p>
+			<label>Address (Line 2):</label>
+			<input type = "text" name = " ${field.name}"
+				value = "${restaurant?.street2}" class="${field.errorClass}" />
+		</p>
+		#{/field}
+		#{field 'city'}
+		<span>
+			<label>City:</label>
+			<input type = "text" name = " ${field.name}"
+				value = "${restaurant?.city}" class="${field.errorClass}" />
+		</span>
+		#{/field}
+		#{field 'state'}
+		<span>
+			<label>State:</label>
+			#{usstates selected:restaurant?.state /}
+		</span>
+		#{/field}
+		#{field 'zipcode'}
+		<p>
+			<label>Zip Code:</label>
+			<input type = "text" name = " ${field.name}"
+				value = "${restaurant?.zipcode}" class="${field.errorClass}" />
+		</p>
+		#{/field}
+		#{field 'phone'}
+		<p>
+			<label>Phone:</label>
+			<input type = "text" name = " ${field.name}"
+				value = "${restaurant?.phone}" class="${field.errorClass}" />
+		</p>
+		#{/field}
+		#{field 'website'}
+		<p>
+			<label>Website:</label>
+			<input type = "text" name = " ${field.name}"
+				value = "${restaurant?.website}" class="${field.errorClass}" />
+		</p>
+		#{/field}
+		<p>
+		<label>Cuisine</label>
+		#{select_cuisine selected:restaurant?.cuisine /}
+		</p>
+		#{field 'cost'}
+		<p>
+			<label>Price range:</label>
+			<input type = "text" name = " ${field.name}"
+				value = "${restaurant?.cost}" class="${field.errorClass}" />
+		</p>
+		#{/field}
+
+    *{ Restaurant's description and picture }*
+    #{field 'content'}
+	  <p>
+      <label>Write a description for your restaurant here:</label>
+      <textarea name="${field.name}"
+          class="${field.errorClass}">${post?.content}</textarea>
+	  </p>
+	  #{/field}
+    <p>
+    #{field 'pic'}
+    	<label>Up a pic</label>
+	   <input type="file" name="${field.name}"  class="${field.errorClass}" />
+	#{/field}
+
+
+    <p>
+        <input type="submit" value="Save" />
+				<input type = "reset" value = "Undo Changes" />
+    </p>
+
+#{/form}

@@ -1,0 +1,123 @@
+#{extends 'UserProfile.html' /}
+#{set title:'Edit Your Post' /}
+#{set header:'Edit Your Post' /}
+#{set 'moreScripts'}
+	#{script 'jquery-1.7.2.min.js' /}
+	#{script 'rating-stars.js' /}
+	#{script 'jquery-ui-1.8.19.custom.min.js' /}
+#{/set}
+#{stylesheet src:'jquery-ui-1.8.19.custom.css' /}
+
+
+<script type = "text/javascript">
+	$(init);
+
+	function init() {
+		$("#dialog").dialog({autoOpen: false, buttons: {
+			"Yes" : function() {
+			 document.location.href = "@{deletePost(post?.id)}";
+			},
+			"No" : function() {
+				$(this).dialog("close");
+			}
+	}});
+	}
+
+	function deletePost() {
+		$("#dialog").dialog("option", "title", "Delete Post");
+		$("#dialog").html("Are you sure you want to delete this post?");
+		$("#dialog").dialog("open");
+	}
+	
+	var delete_post = #{jsAction @deletePost(':id') /};
+</script>
+
+#{ifnot post?.id}
+    <h3>Write <span>a new post</span></h3>
+#{/ifnot}
+#{else}
+    <h3>Edit <span>this post</span></h3>
+#{/else}
+
+#{form @saveEditedPost(post?.id), enctype:'multipart/form-data'}
+
+    #{ifErrors}
+        <p class="error">
+            Please correct these errors.
+        </p>
+    #{/ifErrors}
+
+    <p>
+        #{field 'title'}
+				<span class = "err">#{error 'title' /}</span>
+        <label>Post title:</label>
+        <input type="text" name="${field.name}"
+            value="${post?.title}" class="${field.errorClass}" />
+        #{/field}
+    </p>
+	  <p>
+	    #{field 'message'}
+				<span class = "err">#{error 'message' /}</span>
+	    <label>Message:</label>
+	    <textarea name="${field.name}" cols = "90" rows = "7"
+	        class="${field.errorClass}">${post?.content}</textarea>
+	    #{/field}
+		<p>
+			<a href = "javascript:deletePost()">Delete Post</a>
+		</p>
+	  </p>
+		<fieldset id = "restaurant_info">
+			<legend> Restaurant Info </legend>
+			<p>
+				#{field 'restaurantData' }
+				<label>Name of restaurant:</label>
+				<input type = "text" name = "${field.name}" id = "restaurant_name"
+					value = "${post?.restaurant?.name}" class="${field.errorClass}" onKeyUp = "showRestaurant();" />
+				#{/field}
+			</p>
+			#{field 'rating'}
+				<div id = "${field.name}">
+					<label>Rating</label>
+					<label class = "stars" onClick = "highlightStar(1);">
+						<input type = "radio" name = "${field.name}" id = "rating_1" value = "1"
+							${post?.rating == 1 ? 'checked' : ''} />
+					</label>
+					<label class = "stars" onClick = "highlightStar(2);">
+						<input type = "radio" name = "${field.name}" id = "rating_2" value = "2"
+							${post?.rating == 2 ? 'checked' : ''} />
+					</label>
+					<label class = "stars" onClick = "highlightStar(3);">
+						<input type = "radio" name = "${field.name}" id = "rating_3" value = "3"
+							${post?.rating == 3 ? 'checked' : ''} />
+					</label>
+					<label class = "stars" onClick = "highlightStar(4);">
+						<input type = "radio" name = "${field.name}" id = "rating_4" value = "4"
+							${post?.rating == 4 ? 'checked' : ''} />
+					</label>
+					<label class = "stars" onClick = "highlightStar(5);">
+						<input type = "radio" name = "${field.name}" id = "rating_5" value = "5"
+							${post?.rating == 5 ? 'checked' : ''} />
+					</label>
+				</div>
+			#{/field}
+		</fieldset>
+    <p>
+    #{field 'pic'}
+    	<label>Up a pic</label>
+	   <input type="file" name="${field.name}"  class="${field.errorClass}" />
+	#{/field}
+
+    <p>
+        #{field 'tags'}
+        <label>Enter some tags:</label>
+        <input type="text" size="50" name="${field.name}" value="${post?.tags?.join(' ')}" />
+        #{/field}
+    </p>
+
+    <p>
+        <input type="submit" value="Save Post" />
+				<input type = "reset" value = "Undo Changes" />
+    </p>
+
+#{/form}
+<div id = "dialog"></div>

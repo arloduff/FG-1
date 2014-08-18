@@ -1,0 +1,65 @@
+#{extends 'restaurants.html' /}
+
+#{form @registerUser(user), enctype:'multipart/form-data'}
+    #{ifErrors}
+        <p class="error">
+            Please correct these errors.
+        </p>
+    #{/ifErrors}	<fieldset>
+		<legend> Sign Up </legend>
+		#{field 'firstname'}
+			<div id = "firstname">
+				<span class = "err">#{error 'name' /}</span>
+				<label>First Name: </label><input type = "text" id = "${field.id}" name = "${field.name}" value = "${params.firstname}" class = "${field.errorClass}" />
+			</div>
+		#{/field}
+		#{field 'lastname'}
+			<div id = "lastname">
+				<span class = "err">#{error 'name' /}</span>
+				<label>Last Name: </label><input type = "text" id = "${field.id}" name = "${field.name}" value = "${params.lastname}" class = "${field.errorClass}" />
+			</div>
+		#{/field}
+		#{field 'email'}
+			<div id = "email">
+				<span class = "err">#{error 'email' /}</span>
+				<label>E-mail Address: </label><input type = "text" id = "${field.id}"  name = "${field.name}" value = "${params.email}" class = "${field.errorClass}" />
+			</div>
+		#{/field}
+		#{field 'password'}
+			<div id = "password">
+				<span class = "err">#{error 'password' /}</span>
+				<label>Password: </label><input type = "password" id = "${field.id}"  name = "${field.name}" value = "${params.password}" class = "${field.errorClass}" />
+			</div>
+		#{/field}
+		#{field 'confirm'}
+			<div id = "confirm">
+				<span class = "err">#{error 'confirm' /}</span>
+				<label>Confirm Password: </label><input type = "password" id = "${field.id}"  name = "${field.name}" value = "${params.confirm}" class = "${field.errorClass}" />
+			</div>
+		#{/field}
+
+		#{field 'captcha'}
+			<div id = "captcha">
+				<label>Type the code shown below: </label>
+				<span class = "err">#{error 'captcha' /}</span>
+				<img src = "@{Application.captcha(randomID)}" id = "captcha" />
+				<input type = "text" name = "${field.name}" id = "${field.id}" class = "${field.errorClass}" />
+				<input type = "hidden" name = "randomID" value = "${randomID}" />
+			</div>
+		#{/field}
+
+		<div>
+			<input type = "submit" value = "Submit" />
+		</div>
+	</fieldset>
+#{/form}
+
+#{set 'sidebar'}
+<p>
+	Fotogrub is a fun, friendly community just for food lovers! Post your favorite recipes, share your favorite
+	restaurants with others, or just chat away when you have a minute!
+</p>
+<p>
+	It takes only a second to make an account, so sign up with us and start sharing meals in seconds!
+</p>
+#{/set}

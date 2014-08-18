@@ -1,0 +1,14 @@
+#{if following.size() == 0}
+	${loggedInAs == user ? 'You currently aren\'t following anyone.' : user.firstname + ' currently isn\'t following anyone.'}
+#{/if}
+
+#{list items:following, as:'follow'}
+	#{display_user_profile_link who:follow, display_remove_link:(loggedInAs == user ? true : false) /}
+#{/list}
+
+#{if following.size >= sn_list_size}
+<div class = "more_sn">
+	<a href = "@{UserProfile.friends(user.id)}">More Following</a>
+</div>
+#{/if}
+

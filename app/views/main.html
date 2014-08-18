@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<title>#{get 'title' /}</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=${_response_encoding}"/>
+		#{stylesheet src:"main.css" /}
+    #{get 'moreStyles' /}
+		<link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}" />
+    #{get 'moreScripts' /}
+	</head>
+	<body>
+
+		<div id="header">
+				#{user_tools /}
+		<div id="logo">
+			fotogrub
+		</div><!-- logo -->
+		<div id="title">
+		<h1>#{get 'header' /}</h1>
+		    </div><!-- title -->
+
+		</div><!-- header -->
+
+		<div id="subheader">
+			<p align="center">Select a restaurant to find in: 
+
+				<!-- Dynamically generate list of most popular cities and the links to search them -->
+				#{top_ten_cities /}
+			</p> 
+		</div><!-- subheader -->
+
+		<div id = "content">
+			#{doLayout /}
+		</div><!-- content -->
+
+		<div id="footer">
+			Fotogrub, a place for food lovers!
+		</div><!-- footer --> 
+	</body>
+</html>

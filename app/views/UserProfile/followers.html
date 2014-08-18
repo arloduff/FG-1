@@ -1,0 +1,24 @@
+#{extends 'UserProfile.html' /}
+#{set title:loggedInAs.firstname + '\'s Followers' /}
+#{set header:user == loggedInAs ? 'Your Followers' : user.firstname + '\'s Followers' /}
+#{set 'moreStyles'}
+	#{stylesheet src:'jquery-ui-1.8.19.custom.css' /}
+	#{stylesheet src:'pagination.css' /}
+#{/set}
+
+<div class = "ui-tabs ui-widget ui-widget-content ui-corner-all">
+	<ul class = "ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+		<li class = "ui-state-default ui-corner-top">
+			<a href = "@{UserProfile.friends(user.id)}">Following</a>
+		</li>
+		<li class = "ui-state-default ui-corner-top ui-tabs-selected ui-state-active">
+			<a href = "@{UserProfile.followers(user.id)}">Followers</a>
+		</li>
+	</ul>
+</div>
+<h1>${loggedInAs == user ? 'Your' : user.firstname + '\'s'} Followers</h1>
+#{paginate.list items:paginator, as:'follow'}
+	#{display_user_profile_link who:follow, display_remove_link:false /}
+#{/paginate.list}
+#{paginate.controls items:paginator /}
+

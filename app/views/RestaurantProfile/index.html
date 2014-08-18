@@ -1,0 +1,89 @@
+*{ Restaurant's Profile Page }*
+#{extends 'restaurants.html' /}
+#{set title:restaurant.name + ' - Fotogrub' /}
+
+
+<!-- You may have any number of #set tags which will be matched with any #get declared in your main layout. -->
+<div id="doLayout">
+	<div id = "restaurantPic">
+		<img src="#{jsAction @RestaurantProfile.profilePic(':id') /}" alt = "No picture uploaded." />
+	</div>
+
+	*{ Display the restaurant's info }*
+	<div id = "restaurantInfo">
+		<h2>${restaurant.name}</h2>
+			#{if restaurant.street1}
+				<div id = "street1">
+					${restaurant.street1}
+				</div>
+			#{/if}
+			#{if restaurant.street2}
+				<div id = "street2">
+					<span>${restaurant.street2}</span>
+				</div>
+			#{/if}
+			<div id = "city">
+				*{ Display the city and state only if they're entered for this restaurant }*
+				<span>${restaurant.city}${restaurant?.city && restaurant?.state.name ? ', ' : ''} ${restaurant?.state?.name ? restaurant.state : ''} ${restaurant.zipcode restaurant.zipcode : ''}</span>
+			</div>
+			#{if restaurant.phone}
+				<div id = "phone">
+					<span>${restaurant.phone}</span>
+				</div>
+			#{/if}
+			#{if restaurant.website}
+				<div id = "website">
+					<label>Website: </label><span><a href = "${restaurant.website}">${restaurant.website}</a></span>
+				</div>
+			#{/if}
+			#{if restaurant.cuisine}
+				<div id = "cuisine">
+					<label>Cuisine: </label><span>${restaurant.cuisine}</span>
+				</div>
+			#{/if}
+			#{if restaurant.cost}
+				<div id = "price">
+					<label>Price Range: </label><span>$${restaurant.cost}</span>
+				</div>
+			#{/if}
+		</div><!-- restaurantInfo / -->
+
+		#{if restaurant.aboutUs}
+			<div id = "about">
+				<h3>About Us</h3>
+				${restaurant.aboutUs}
+			</div>
+		#{/if}
+
+		*{ If the restaurant owner has an account with us, only they should be able to edit the restaurant's info. Otherwise, anyone can. }*
+		#{if user == restaurant.owner || user?.isAdmin || restaurant.owner == null}
+			<div class = "editRestaurantLink">
+				<a href = "@{RestaurantProfile.editform(restaurant?.id)}">Edit this restaurant</a>
+			</div>
+		#{/if}
+		</div>
+</div>
+
+
+
+*{ Display the review of the day }*
+#{set 'sidebar'}
+	<u>Review of the day!</u>
+	#{display post:reviewOfTheDay, as:'teaser' /}
+
+#{/set}
+
+*{ And display other reviews too }*
+#{set 'reviewbar'}
+	<u>Reviews</u>
+
+	<div class="reviews-list">
+		<ul>
+		#{list items:restaurantReviews, as :'review'}
+			<li>	#{display post:review, as:'teaser' /} </li>
+		#{/list}
+		</ul>
+	</div>
+
+#{/set}
+

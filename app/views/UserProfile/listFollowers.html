@@ -1,0 +1,14 @@
+#{if followers.size() == 0}
+	${loggedInAs == user ? 'You currently don\'t have any followers.' : user.firstname + ' currently doesn\'t have any followers.'}
+#{/if}
+
+#{list items:followers, as:'follow'}
+	#{display_user_profile_link who:follow, display_remove_link:false /}
+#{/list}
+
+#{if followers.size >= sn_list_size}
+<div class = "more_sn">
+	<a href = "@{UserProfile.followers(user.id)}">More Followers</a>
+</div>
+#{/if}
+

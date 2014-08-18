@@ -1,0 +1,296 @@
+#{extends 'UserProfile.html' /}
+#{set 'moreScripts'}
+	#{script 'rating-stars.js' /}
+	#{script 'jquery-1.7.2.min.js' /}
+	#{script 'jquery-ui-1.8.19.custom.min.js' /}
+#{/set}
+#{set 'moreStyles'}
+	#{stylesheet src:'jquery-ui-1.8.19.custom.css' /}
+#{/set}
+#{set title:user.firstname + ' \'s Profile' /}
+#{set header:loggedInAs == user ? 'My Profile' : user.firstname + '\'s Profile' /}
+
+<script type = "text/javascript">
+	//<![CDATA[
+	var userPic = #{jsAction @profilePic(':userId') /};
+
+	$(init);
+//Set up all jQuery elements here
+	function init() {
+		//Dialog box for responses
+		$("#response").dialog({
+			autoOpen: false,
+			buttons: {
+				"OK" : function() {$(this).dialog("close");}
+			}
+		});
+
+
+		//Tabs for Social Network panel
+		$("#socialNetwork").tabs();
+
+		$("#restaurantData").autocomplete({
+			source: '@{findRestaurants()}',
+			minLength: 4
+		});
+	}
+
+#{if loggedInAs != user}
+	//The user should only have the option to add or remove followers if they're looking at someone else's profile page, not their own.
+
+	function addFollow() {
+		var addFollowQuery = #{jsAction @addFollower(':who') /};
+		$.getJSON(addFollowQuery({who: '${user?.id}'}), function(data) {
+			var responseMsg;
+			
+			if(data.success) {	
+				$("#followLink").html("<a href = \"javascript:removeFollow()\">No longer follow this user</a>");
+				responseMsg = data.name + " has been successfully added to your contacts.";
+			}
+			else {
+				responseMsg = "${user?.firstname} cannot be added to your contacts at this time.";
+			}
+
+			//Remove the img if it's already there from opening the window before.
+			$("#response img").remove();
+			$("#response").prepend('<img src = "' + userPic({userId: '${user.id}'}) + '" alt = "" />');
+			$("#response p").html(responseMsg);
+			$("#response").dialog("open");
+			$("#socialNetwork").tabs('load', 1);	//Refresh the following list now that we're following this user
+		});
+	}
+
+	function removeFollow() {
+		var removeFollowQuery = #{jsAction @removeFollower(':who') /};
+		$.getJSON(removeFollowQuery({who: '${user?.id}'}), function(data) {
+			var responseMsg;
+			
+			if(data.success) {	
+				$("#followLink").html("<a href = \"javascript:addFollow()\">Follow this user</a>");
+				responseMsg = data.name + " has been successfully removed from your contacts.";
+			}
+			else {
+				responseMsg = "We're sorry, the requested operation could not be performed. Please try again.";
+			}
+
+			//Remove the img if it's already there from opening the window before.
+			$("#response img").remove();
+			$("#response").prepend('<img src = "' + userPic({userId: '${user.id}'}) + '" alt = "" />');
+			$("#response p").html(responseMsg);
+			$("#response").dialog("open");
+			$("#socialNetwork").tabs('load', 1);	//Refresh the following list now that we're following this user
+		});
+	}
+#{/if}
+
+#{else}
+	//This is the function to stop following someone from the list on the user's profile page. He should only see this if he's looking at
+	//his profile page
+
+	function removeFollowById(userId) {
+		var removeFollowQuery = #{jsAction @removeFollower(':who') /};
+		$.getJSON(removeFollowQuery({who: userId}), function(data) {
+			var responseMsg;
+			
+			if(data.success) {	
+				responseMsg = data.name + " has been successfully removed from your contacts.";
+			}
+			else {
+				responseMsg = "We're sorry, the requested operation could not be performed. Please try again.";
+			}
+
+			//Remove the img if it's already there from opening the window before.
+			$("#response img").remove();
+			$("#response").prepend('<img src = "' + userPic({userId: userId}) + '" alt = "" />');
+			$("#response p").html(responseMsg);
+			$("#response").dialog("open");
+			$("#socialNetwork").tabs('load', 0);	//Refresh the following list now that we're no longer following this user
+		});
+	}
+
+
+	function toggleRestaurantInfo() {
+		var restaurantInfoId = document.getElementById("restaurantInfo");
+		var linkId = document.getElementById("associateRestaurant").children[0];
+
+		if(restaurantInfoId.style.display == "" || restaurantInfoId.style.display == "none") { //For browser compatibility, check "" and "none"
+			restaurantInfoId.style.display = "block";
+			linkId.innerHTML = "Dissociate restaurant";
+		}
+		else {
+			restaurantInfoId.style.display = "none";
+			linkId.innerHTML = "Associate a restaurant with this post";
+		}
+	}
+
+#{/else}
+
+	//]]>
+</script>
+
+#{if loggedInAs == user}
+	#{form @newPost(user.id), enctype:'multipart/form-data'}
+	#{ifErrors}
+		<p class = "error">
+			We're sorry, we found the following errors in your post:
+			#{list errors, as:'err'}
+			<div class = "err">
+				${err}
+			</div>
+			#{/list}
+		</p>
+	#{/ifErrors}
+		<fieldset>
+			<legend> Write a new post </legend>
+			#{field 'title'}
+				<div id = "postTitle">
+				<label>Title</label>
+				<input type = "text" name = "${field.name}" value = "${params.title}" />
+				</div>
+			#{/field}
+			#{field 'message'}
+				<div name = "message">
+				<label>Message</label>
+				<textarea id = "${field.name}" name = "${field.name}" rows = "2" cols = "80">${params.message}</textarea>
+				</div>
+			#{/field}
+			<p id = "associateRestaurant">
+				<a href = "javascript:toggleRestaurantInfo()">Associate a restaurant with this post</a>
+			</p>
+
+			<div id = "restaurantInfo">
+				#{field 'restaurantData'}
+					<div id>
+					<label>Restaurant: </label>
+					<input type = "text" name = "${field.name}" value = "${params.restaurantName}" id = "${field.id}" />
+					</div>
+				#{/field}
+				#{field 'rating'}
+					<div id = "${field.name}">
+					<label>Rating</label>
+					<label class = "stars" onClick = "highlightStar(1);">
+						<input type = "radio" name = "${field.name}" id = "rating_1" value = "1"
+							${post?.rating == 1 ? 'checked' : ''} />
+					</label>
+					<label class = "stars" onClick = "highlightStar(2);">
+						<input type = "radio" name = "${field.name}" id = "rating_2" value = "2"
+							${post?.rating == 2 ? 'checked' : ''} />
+					</label>
+					<label class = "stars" onClick = "highlightStar(3);">
+						<input type = "radio" name = "${field.name}" id = "rating_3" value = "3"
+							${post?.rating == 3 ? 'checked' : ''} />
+					</label>
+					<label class = "stars" onClick = "highlightStar(4);">
+						<input type = "radio" name = "${field.name}" id = "rating_4" value = "4"
+							${post?.rating == 4 ? 'checked' : ''} />
+					</label>
+					<label class = "stars" onClick = "highlightStar(5);">
+						<input type = "radio" name = "${field.name}" id = "rating_5" value = "5"
+							${post?.rating == 5 ? 'checked' : ''} />
+					</label>
+					</div>
+				#{/field}
+			</div><!-- restaurantInfo -->
+
+			<div id = "submitButtons">
+				<input type = "submit" value = "Post" />
+				<input type = "reset" value = "Erase All" />
+			</div>
+		</fieldset>
+	#{/form}
+#{/if}
+
+<h4>${loggedInAs == user ? 'Your' : user.firstname + '\'s'} Recent Posts</h4>
+<div id = "recentPosts">
+#{if posts.size > 0}
+	#{list posts, as:'post'}
+		#{display post:post, as:'teaser', loggedInAs:loggedInAs /}
+	#{/list}
+	#{if posts.size >= 5}
+		<a href = "@{UserProfile.posts(user.id)}" class = "more_button"><button>More Posts</button></a>
+	#{/if}
+#{/if}
+#{else}
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		#{if loggedInAs == user}
+			Hmmm... it doesn't look like you have any posts yet. You can write your first post in the box above.
+		#{/if}
+		#{else}
+			Hmmm... it doesn't look like this user has any posts yet. Maybe you could friend him and help get him started?
+		#{/else}
+#{/else}
+</div>
+
+
+#{if comments.size > 0}
+<hr />
+<h4>${loggedInAs == user ? 'Your' : user.firstname + '\'s'} Recent Comments</h4>
+<div id = "recentComments">
+	#{list comments, as:'comment'}
+		#{display post:comment.post, as:'teaser', loggedInAs:loggedInAs /}
+	#{/list}
+	#{if comments.size >= 5}
+		<a href = "@{UserProfile.comments(user.id)}" class = "more_button"><button>More Comments</button></a>
+	#{/if}
+</div>
+#{/if}
+
+
+
+#{set 'sidebar'}
+<div id = "sidebar">
+<h2 id = "name">${user.firstname}</h2>
+<div id = "aboutme">
+	<div id = "profilePic">
+		<img src = "@{UserProfile.profilePic(user.id)}" alt = "" class = "profilePic" />
+	</div>
+	#{if user.city != "" && user.city != null}
+	<p id = "location">
+		<label>Location: </label>${user.city}${user.state != null ? ', ' + user.state : ''}
+	</p>
+	#{/if}
+	#{if user.aboutme != ""}
+		<h3>About Me</h3>
+		<p id = "aboutMeText">
+			${user.aboutme}
+		</p>
+	#{/if}
+	#{if loggedInAs == user}
+		<a href = "@{UserProfile.editform(user.id)}" class = "editFormLink">Edit your profile</a>
+	#{/if}
+	#{elseif loggedInAs != null && !controllers.UserProfile.isFollowing(loggedInAs.id, user.id)}
+		<div id = "followLink">
+			<a href = "javascript:addFollow()">Follow this user</a>
+		</div>
+	#{/elseif}
+	#{elseif loggedInAs != null && controllers.UserProfile.isFollowing(loggedInAs.id, user.id)}
+		<div id = "followLink">
+			<a href = "javascript:removeFollow()">No longer follow this user</a>
+		</div>
+	#{/elseif}
+</div>
+
+<div id = "response" title = "Fotogrub">
+	<p></p>
+</div>
+
+
+
+
+<!-- Add social networking tabs (i.e. Following, Followers, etc.) here -->
+
+<div id = "socialNetwork">
+	<ul>
+		<li><a href = "@{UserProfile.listFollowing(user.id)}">Following</a></li>
+		<li><a href = "@{UserProfile.listFollowers(user.id)}">Followers</a></li>
+	</ul>
+</div>
+
+
+#{/set}
+#{set 'success'}
+	<h3>Your post was successful.</h3>
+	<p>However, we do not have any data available for that restaurant. Please help us by <a href = "@{RestaurantProfile.editform(flash.restaurantID)}">entering it.</a></p>
+</div>
+#{/set}
+

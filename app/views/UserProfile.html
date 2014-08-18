@@ -1,0 +1,18 @@
+#{extends 'main.html' /}
+#{set 'moreStyles'}
+	#{get 'moreStyles' /}
+	#{stylesheet src:'userprofile.css' /}
+#{/set}
+
+#{if flash.success}
+	<div id = "success">
+		#{get 'success' /}
+	</div>
+#{/if}
+
+<div id = "main" />
+	#{doLayout /}
+</div><!-- main -->
+
+#{get 'sidebar' /}
+

@@ -1,0 +1,22 @@
+*{* Main Page for the entire site *}*
+
+#{extends 'reviews.html' /}
+#{set title:'Main' /}
+<!-- You may have any number of #set tags which will be matched with any #get declared in your main layout. -->
+<div id="doLayout">
+
+	<ul>
+	#{list items:restaurants, as:'restaurant'}
+		<li><a href = "@{RestaurantProfile.index(restaurant.id)}">${restaurant.name}</a></li>
+	#{/list}
+	</ul>
+
+</div><!-- doLayout -->
+
+
+
+#{set 'sidebar'}
+	<u>Review of the day!</u>
+	#{display post:frontPost, as:'teaser' /}
+
+#{/set}
